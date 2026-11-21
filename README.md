@@ -12,7 +12,7 @@ android/                      Android project (release signing in app/build.grad
 assets/icon/                  launcher icon sources
 store/                        512×512 store icon + 1024×500 feature graphic
 docs/privacy-policy.html      privacy policy, served by GitHub Pages
-.github/workflows/release.yml CI: test → build signed .aab + .apk
+.github/workflows/release.yml CI: test → build signed arm64 APK
 make_upload_key.sh            creates your signing key (run once)
 STORE_LISTING.md              store text
 ```
@@ -60,7 +60,7 @@ Go to **Actions → Build signed release → Run workflow**, or push a tag:
 git tag v1.0.0 && git push origin v1.0.0
 ```
 
-When the run finishes (about 5–8 minutes), download the **focus-timer-release** artifact. It contains `app-release.aab` and `app-release.apk`. You can install the `.apk` directly on an Android phone to test it.
+When the run finishes (about 5–8 minutes), download the **focus-timer-apk** artifact. It contains `focus-timer-<version>-arm64.apk`, a small signed APK for 64-bit phones. Install it on your phone to test, and upload the same file to the store. The **debug-symbols** artifact is only needed for decoding crash reports.
 
 ### 4. Publish the privacy policy
 
@@ -73,7 +73,7 @@ In the repo, go to **Settings → Pages**. Set Source to *Deploy from a branch*,
 Publishing is free (no registration or listing fee at the time of writing).
 
 1. Sign up at **https://developer.phonepeappstore.com**, verify your email and complete the one-time verification.
-2. Create a new app and upload `app-release.aab`. If it asks for an APK, upload `app-release.apk` instead.
+2. Create a new app and upload the APK. Choose the **APK** option, not AAB, so your signing key stays with you.
 3. Fill in the listing:
    - Text: from `STORE_LISTING.md`
    - Icon: `store/icon-512.png`
@@ -87,7 +87,7 @@ Publishing is free (no registration or listing fee at the time of writing).
 
 1. Bump `version:` in `pubspec.yaml`, for example `1.0.1+2`. The number after `+` must go up every time.
 2. Commit, then push a new tag (`v1.0.1`).
-3. Upload the new `.aab` as a new release in the console.
+3. Upload the new APK as a new release in the console.
 
 ## Ideas for later
 

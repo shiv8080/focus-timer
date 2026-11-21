@@ -2,8 +2,8 @@ name: focus_timer
 description: A simple Pomodoro-style focus timer.
 publish_to: 'none'
 
-# version: <versionName>+<versionCode>. Bump the number after + for every Play upload.
-version: 1.0.0+1
+# version: <versionName>+<versionCode>. The number after + must go up for every store upload.
+version: 1.0.0+2
 
 environment:
   sdk: ^3.6.0
