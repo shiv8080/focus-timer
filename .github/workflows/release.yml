@@ -1,0 +1,81 @@
+name: Build signed release
+
+# Run manually from the Actions tab, or push a tag like v1.0.0.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.50.1
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze --no-fatal-infos
+
+      - name: Test
+        run: flutter test
+
+      - name: Set up release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ] || [ -z "$KEYSTORE_PASSWORD" ]; then
+            echo "::error::Add the KEYSTORE_BASE64 and KEYSTORE_PASSWORD repository secrets first (see README)."
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/upload.p12
+          # Fails early if the password or file is wrong.
+          keytool -list -keystore android/app/upload.p12 -storetype PKCS12 \
+            -storepass "$KEYSTORE_PASSWORD" -alias upload > /dev/null
+          {
+            echo "storeFile=upload.p12"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyPassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=upload"
+          } > android/key.properties
+
+      - name: Build app bundle (.aab)
+        run: flutter build appbundle --release
+
+      - name: Build APK (.apk)
+        run: flutter build apk --release
+
+      - name: Verify APK signature
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --print-certs build/app/outputs/flutter-apk/app-release.apk | head -5
+
+      - name: Remove signing files
+        if: always()
+        run: rm -f android/app/upload.p12 android/key.properties
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: focus-timer-release
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 30
