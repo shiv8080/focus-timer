@@ -41,7 +41,7 @@ flutter test
 ./make_upload_key.sh
 ```
 
-The script asks you for a password. It saves the key to `~/keys/focus-timer-upload.p12` and copies its base64 to your clipboard.
+The script asks you for a password. It saves the key to `keys/focus-timer-upload.p12` in this project (git-ignored) and copies its base64 to your clipboard.
 
 In the repo, go to **Settings → Secrets and variables → Actions → New repository secret** and add:
 
@@ -50,7 +50,7 @@ In the repo, go to **Settings → Secrets and variables → Actions → New repo
 | `KEYSTORE_BASE64` | paste from clipboard |
 | `KEYSTORE_PASSWORD` | the password you chose |
 
-> **Back up `~/keys/focus-timer-upload.p12` and the password** (in a password manager or other safe storage). Every future update has to be signed with this key. If you lose it, users can't update the app. Never commit the key.
+> **Back up `keys/focus-timer-upload.p12` and the password** (in a password manager or other safe storage). Every future update has to be signed with this key. If you lose it, users can't update the app. Never commit the key.
 
 ### 3. Build
 

@@ -11,7 +11,8 @@
 # BACK UP the .p12 file and password (e.g. in a password manager). Every future update must be signed with this key.
 set -euo pipefail
 
-OUT="${KEY_OUT:-$HOME/keys/focus-timer-upload.p12}"
+# Default: <project>/keys/, which is git-ignored.
+OUT="${KEY_OUT:-$(cd "$(dirname "$0")" && pwd)/keys/focus-timer-upload.p12}"
 if [[ -e "$OUT" ]]; then
   echo "$OUT already exists, refusing to overwrite your key." >&2
   exit 1
